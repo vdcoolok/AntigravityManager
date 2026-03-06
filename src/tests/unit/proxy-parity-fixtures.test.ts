@@ -10,6 +10,8 @@ const mockTokenManager = {
   getNextToken: vi.fn(),
   markAsRateLimited: vi.fn(),
   markAsForbidden: vi.fn(),
+  markFromUpstreamError: vi.fn(),
+  recordParityError: vi.fn(),
 };
 const mockGeminiClient = { streamGenerateInternal: vi.fn(), generateInternal: vi.fn() };
 
