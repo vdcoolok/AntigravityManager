@@ -521,7 +521,7 @@ export async function importCloudAccounts(
           provider: acc.provider,
           name: acc.name ?? existing.name,
           avatar_url: acc.avatar_url ?? existing.avatar_url,
-          token: acc.token,
+          token: acc.token ?? existing.token,
           quota: acc.quota ?? existing.quota,
           device_profile: acc.device_profile ?? existing.device_profile,
           device_history: acc.device_history ?? existing.device_history,
@@ -532,6 +532,11 @@ export async function importCloudAccounts(
         await CloudAccountRepo.addAccount(updatedAccount);
         result.updated++;
       } else {
+        if (!acc.token) {
+          result.errors.push(`Cannot import new account ${acc.email}: missing token data`);
+          continue;
+        }
+
         const newAccount: CloudAccount = {
           id: uuidv4(),
           provider: acc.provider,

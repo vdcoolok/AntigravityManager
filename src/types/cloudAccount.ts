@@ -118,7 +118,7 @@ export const CloudAccountExportSchema = z.object({
       email: z.string(),
       name: z.string().optional().nullable(),
       avatar_url: z.string().optional().nullable(),
-      token: CloudTokenDataSchema,
+      token: CloudTokenDataSchema.optional(),
       quota: CloudQuotaDataSchema.optional(),
       device_profile: z.any().optional(),
       device_history: z.any().optional(),
