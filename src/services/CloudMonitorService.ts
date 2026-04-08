@@ -18,7 +18,7 @@ export class CloudMonitorService {
     this.stop();
   }
 
-  static start() {
+  static async start() {
     if (this.intervalId) return;
     logger.info('Starting CloudMonitorService...');
 
@@ -26,7 +26,7 @@ export class CloudMonitorService {
     this.lastFocusTime = Date.now();
 
     // Initial Poll
-    this.poll().catch((e) => logger.error('Initial poll failed', e));
+    await this.poll().catch((e) => logger.error('Initial poll failed', e));
 
     this.startInterval();
   }

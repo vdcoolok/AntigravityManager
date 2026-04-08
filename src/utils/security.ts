@@ -304,8 +304,6 @@ async function generatePrimaryMasterKey(): Promise<MasterKeyState> {
       }
       return { key: result.key, source: 'safeStorage' };
     } catch (error) {
-      // If we failed to decrypt but the file exists, we should NOT proceed to other fallbacks
-      // as they might overwrite the existing file and cause permanent data loss.
       const fileExists = await fs
         .access(keyPath)
         .then(() => true)

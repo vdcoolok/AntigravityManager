@@ -370,9 +370,10 @@ app
     try {
       await CloudAccountRepo.init();
     } catch (e) {
-      logger.error('Startup: Failed to initialize CloudAccountRepo', e);
-      // We might want to exit here or show a dialog, but for now we proceed
-      // though functionality will be broken.
+      logger.error(
+        'Startup: Failed to initialize CloudMonitorService. The application will continue, but quota monitoring may not work correctly.',
+        e,
+      );
     }
 
     logger.info('Step: Initialize Antigravity DB (WAL Mode)');
@@ -424,13 +425,16 @@ app
       const enabled = CloudAccountRepo.getSetting('auto_switch_enabled', false);
       if (enabled) {
         logger.info('Startup: Auto-Switch enabled, starting monitor...');
-        CloudMonitorService.start();
+        await CloudMonitorService.start();
       } else {
         logger.info('Startup: Auto-Switch disabled, running one-time quota and AI credits sync...');
         await CloudMonitorService.poll();
       }
     } catch (e) {
-      logger.error('Startup: Failed to initialize services', e);
+      logger.error(
+        'Startup: Failed to initialize CloudMonitorService. The application will continue, but quota monitoring may not work correctly.',
+        e,
+      );
     }
   })
   .then(async () => {

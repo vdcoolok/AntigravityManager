@@ -62,7 +62,12 @@ describe('CloudMonitorService', () => {
 
     expect(CloudAccountRepo.getAccounts).toHaveBeenCalled();
     expect(GoogleAPIService.fetchQuota).toHaveBeenCalledWith('valid_token', undefined);
-    expect(CloudAccountRepo.updateQuota).toHaveBeenCalledWith('acc1', expect.anything());
+    expect(CloudAccountRepo.updateQuota).toHaveBeenCalledWith(
+      'acc1',
+      expect.objectContaining({
+        models: expect.any(Object),
+      }),
+    );
     expect(CloudAccountRepo.updateLastUsed).toHaveBeenCalledWith('acc1');
     expect(AutoSwitchService.checkAndSwitchIfNeeded).toHaveBeenCalled();
   });
@@ -94,8 +99,41 @@ describe('CloudMonitorService', () => {
     await pollPromise;
 
     expect(GoogleAPIService.refreshAccessToken).toHaveBeenCalledWith('ref_token', undefined);
-    expect(CloudAccountRepo.updateToken).toHaveBeenCalled();
+    expect(CloudAccountRepo.updateToken).toHaveBeenCalledWith(
+      'acc1',
+      expect.objectContaining({
+        access_token: 'new_token',
+        expires_in: 3600,
+      }),
+    );
     expect(GoogleAPIService.fetchQuota).toHaveBeenCalledWith('new_token', undefined);
+  });
+
+  it('should handle refreshAccessToken failure during poll', async () => {
+    const mockAccounts = [
+      {
+        id: 'acc1',
+        email: 'expired@example.com',
+        token: {
+          access_token: 'old_token',
+          refresh_token: 'ref_token',
+          expiry_timestamp: Math.floor(Date.now() / 1000) - 100,
+        },
+      },
+    ];
+
+    vi.mocked(CloudAccountRepo.getAccounts).mockResolvedValue(mockAccounts as never);
+    vi.mocked(GoogleAPIService.refreshAccessToken).mockRejectedValue(
+      new Error('Token refresh failed'),
+    );
+
+    const pollPromise = CloudMonitorService.poll();
+    await vi.advanceTimersByTimeAsync(1000);
+    await pollPromise;
+
+    expect(GoogleAPIService.refreshAccessToken).toHaveBeenCalledWith('ref_token', undefined);
+    expect(CloudAccountRepo.updateToken).not.toHaveBeenCalled();
+    expect(GoogleAPIService.fetchQuota).not.toHaveBeenCalled();
   });
 
   describe('handleAppFocus (Smart Refresh)', () => {
