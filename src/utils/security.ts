@@ -117,7 +117,7 @@ async function readSafeStorageKey(keyPath: string): Promise<Buffer | null> {
       'Security: Decryption of safeStorage key file failed. Keyring might be locked.',
       error,
     );
-    throw error;
+    throw new Error('Failed to decrypt safeStorage key file. The keyring may be locked.');
   }
 }
 
@@ -313,7 +313,9 @@ async function generatePrimaryMasterKey(): Promise<MasterKeyState> {
           'Security: safeStorage key file exists but decryption failed. Keyring might be locked. Stopping to prevent data loss.',
           error,
         );
-        throw error;
+        throw new Error(
+          'Failed to decrypt safeStorage key file. The keyring may be locked or the key file may be corrupted.',
+        );
       }
       logger.warn('Security: safeStorage failed, trying keytar', error);
     }

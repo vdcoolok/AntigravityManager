@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { formatCreditsExpiry } from '@/utils/format';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -327,16 +328,6 @@ export function CloudAccountCard({
   const shouldShowAiCredits =
     !!aiCredits && Number.isFinite(aiCredits.credits) && aiCredits.credits >= 0;
 
-  const formatCreditsExpiry = (expiryDate: string) => {
-    if (!expiryDate) return '';
-    try {
-      const date = new Date(expiryDate);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    } catch {
-      return expiryDate;
-    }
-  };
-
   return (
     <Card
       className={`group bg-card hover:border-primary/40 flex h-full flex-col overflow-hidden border transition-all duration-200 hover:shadow-sm ${isSelected ? 'ring-primary border-primary/50 ring-2' : ''}`}
@@ -627,16 +618,6 @@ export function CompactCloudAccountCard({
   const aiCredits = account.quota?.ai_credits;
   const shouldShowAiCredits =
     !!aiCredits && Number.isFinite(aiCredits.credits) && aiCredits.credits >= 0;
-
-  const formatCreditsExpiry = (expiryDate: string) => {
-    if (!expiryDate) return '';
-    try {
-      const date = new Date(expiryDate);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    } catch {
-      return expiryDate;
-    }
-  };
 
   return (
     <div className="group bg-card hover:border-primary/40 flex items-center gap-3 rounded-lg border px-3 py-2 transition-all duration-200">
